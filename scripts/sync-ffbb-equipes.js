@@ -31,6 +31,14 @@ const EQUIPES_FFBB = [
     phase: '200000002897655',
     poule: '200000003055527',
     nomPoule: 'Régionale Féminine - Division 3'
+  },
+  // --- TEST TEMPORAIRE (à retirer ensuite) : poule de PNM, qui fonctionne déjà ---
+  {
+    id: 'test-pnm',
+    url: 'https://competitions.ffbb.com/ligues/ara/competitions/pnm',
+    phase: '200000002897652',
+    poule: '200000003055512',
+    nomPoule: 'Test PNM'
   }
 ];
 // =========================================================================
@@ -258,6 +266,7 @@ async function main() {
 
   let echecs = 0;
   for (const eq of EQUIPES_FFBB) {
+    await new Promise(r => setTimeout(r, 3000));
     try {
       await syncEquipe(admin, db, eq);
     } catch (err) {
