@@ -1,0 +1,36 @@
+name: Sonde Scorenco
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonde:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Installation du navigateur sans écran
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Sonde Scorenco
+        run: node scripts/sonde-scorenco.js
+
+      - name: Conserver les fichiers de la sonde
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonde-scorenco
+          path: |
+            page.txt
+            page.html
+            page.png
+            json-*.json
+          if-no-files-found: ignore
