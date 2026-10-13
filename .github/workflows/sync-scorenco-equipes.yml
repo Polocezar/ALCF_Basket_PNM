@@ -1,0 +1,37 @@
+name: Synchronisation Scorenco équipes Amicale
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du dépôt
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Installation des dépendances
+        run: npm install
+
+      - name: Installation du navigateur sans écran
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Synchronisation Scorenco des équipes
+        run: node scripts/sync-scorenco-equipes.js
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Conserver le texte lu (diagnostic)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: texte-scorenco
+          path: scorenco-*.txt
+          if-no-files-found: ignore
