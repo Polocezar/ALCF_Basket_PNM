@@ -25,15 +25,6 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
 
-      - name: Pause avant les équipes
-        run: sleep 90
-
-      - name: Synchronisation des données FFBB des équipes Amicale
-        continue-on-error: true
-        run: node scripts/sync-ffbb-equipes.js
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
       - name: Envoi des notifications
         run: node scripts/send-notifications.js
         env:
