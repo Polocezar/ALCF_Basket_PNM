@@ -169,8 +169,16 @@ async function fetchFromApi(eq) {
   const filter = encodeURIComponent(JSON.stringify({ idPoule: { _eq: Number(eq.poule) } }));
   const url = `${API_BASE}items/ffbbserver_rencontres?fields=${encodeURIComponent(fields)}&filter=${filter}&sort=date_rencontre&limit=300`;
 
-  const res = await fetch(url, { headers });
-  if (!res.ok) throw new Error(`Erreur rencontres FFBB : HTTP ${res.status}`);
+  let res = await fetch(url, { headers });
+  if (!res.ok) {
+    // Un seul nouvel essai après quelques secondes
+    await new Promise(r => setTimeout(r, 5000));
+    res = await fetch(url, { headers });
+  }
+  if (!res.ok) {
+    const corps = (await res.text().catch(() => '')).replace(/\s+/g, ' ').slice(0, 300);
+    throw new Error(`Erreur rencontres FFBB : HTTP ${res.status} — réponse : ${corps || '(vide)'} — poule ${eq.poule}`);
+  }
   const json = await res.json();
 
   return (json.data || []).map(m => ({
@@ -254,7 +262,7 @@ async function main() {
       await syncEquipe(admin, db, eq);
     } catch (err) {
       echecs++;
-      console.error(`[${eq.id}] Échec :`, err);
+      console.error(`[${eq.id}] ÉCHEC : ${err.message}`);
     }
   }
   if (echecs > 0) process.exit(1);
